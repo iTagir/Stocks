@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script-->
+    <script src="js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="css/stockstyle.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/jquery.tablesorter.min.js"></script>
+    <script src="js/stocklist.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //<!--all data arrays -->
+
+            //enable date picker
+            EnableDatePicker()
+
+            stockTable = $('#stocks').DataTable({
+                "ajax": {
+                    "url": "/stocks"
+                }
+            });
+            $('#stocks').on('draw.dt', function () {
+                registerDelButtons()
+            });
+
+            $("#btnRefresh").click(function () {
+                refreshTable(stockTable, )
+            });
+
+            $("#btnBuy").click(function () {
+                buyCall()
+            });
+            $("#btnSell").click(function () {
+                sellCall()
+            });
+
+
+        }
+        );
+    </script>
+</head>
+
+<body>
+    <ul class="nav nav-tabs">
+        <li role="dash"><a href="#">Dashboard</a></li>
+        <li role="journal" class="active"><a href="transactions.html">Journal</a></li>
+        <li role="stocks"><a href="stocks.html">Stocks</a></li>
+        <li role="dividends"><a href="#">Dividends</a></li>
+    </ul>
+
+    
+        <div class="panel">
+            <div class="panel-body">
+                <div class="form-group form-inline row">
+                    <label id="labTick">Tick</lable>
+            <input type="text" id="tick" size="5" class="form-control">
+            
+            <label id="labQuant">Quantity</lable>
+           
+            <input type="number" id="quant"  class="form-control">
+            
+            <label id="labPrice">Price</lable>
+            <input type="number" id="price" size="5" class="form-control">
+            </div> <div class="form-group form-inline row">
+            <label id="labComm">Commission</lable>
+            <input type="number" id="commission" size="5" class="form-control">
+            <label id="labTax">Tax</lable>
+            <input type="number" id="tax" size="5" class="form-control">
+            <label id="labDate">Date</lable>
+            <input type="text" id="datepicker" size="7" class="form-control">
+            <button id="btnBuy">Buy</button>
+            <button id="btnSell">Sell</button>
+        </div>
+        </div>
+        </div>
+        
+        
+        
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading"><input id="btnRefresh" type="submit" value="Refresh" /></div>
+                <div class="panel-body">
+                    <table id="stocks" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Tick</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tab1">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        
+            <!--<footer class="footer navbar-fixed-bottom">
+                <div class="container">
+                    <p class="text-muted">Place sticky footer content here.</p>
+                </div>
+            </footer>-->
+            <div class="panel-footer panel-primary navbar-fixed-bottom">
+                <div id="statustext"></div>
+            </div>
+    </body>
+</html>
