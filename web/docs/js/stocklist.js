@@ -66,7 +66,8 @@ function buyCall() {
             Price:parseFloat($("#price").val()),
             Quantity:parseInt($("#quant").val()),
             Operation: "Buy",
-            InsertDate: $("#datepicker").val()
+            InsertDate: $("#datepicker").val(),
+            Tax: parseFloat($("#tax").val())
         }
        callBackEnd('/stocks/add',req)
 }

@@ -10,11 +10,13 @@ import (
 	"time"
 )
 
+//StockData to hold stock details
 type StockData struct {
 	Symbol     string        `json:"symbol"`
 	Price      float32       `json:"Price"`
 	Quantity   int           `json:"Quantity"`
 	InsertDate string        `json:"InsertDate"`
+	Tax        float32       `json:"Tax"`
 	Operation  string        `json:"Operation"`
 	Id         bson.ObjectId `json:"id" bson:"_id,omitempty"`
 }
@@ -78,7 +80,7 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 	dlen := len(d)
 	data.Data = make([][]string, 0, dlen-1)
 	for i := 0; i < dlen; i++ {
-		cd := []string{d[i].Symbol, fmt.Sprintf("%f", d[i].Price), fmt.Sprintf("%d", d[i].Quantity), d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
+		cd := []string{d[i].Symbol, fmt.Sprintf("%f", d[i].Price), fmt.Sprintf("%d", d[i].Quantity), fmt.Sprintf("%f", d[i].Tax), d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
 		//cd := coldata{d[i].Symbol, d[i].Price, d[i].Quantity, d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
 		data.Data = append(data.Data, cd)
 		//data.Data = append(data.Data, fmt.Sprintf("%s,%f,%d,%s,%s,<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Symbol, d[i].Price, d[i].Quantity, d[i].InsertDate, d[i].Operation, d[i].Id.Hex()))
