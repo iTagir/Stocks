@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -103,10 +104,9 @@ func handleStocksDel(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	docDir := "C:\\Users\\Tagir\\Documents\\golangspace\\go_workspace\\src\\github.com\\iTagir\\stocks\\web\\docs" //os.Getenv("WA_DOCUMENT_DIR")
-	webHost := "localhost"                                                                                         //os.Getenv("WA_WEB_HOST") //hostname/ip where the web ui listens on
-	webPort := "33000"
-	//os.Getenv("WA_WEB_PORT") //port where the web ui listens on
+	docDir := os.Getenv("WA_DOCUMENT_DIR")
+	webHost := os.Getenv("WA_WEB_HOST") //hostname/ip where the web ui listens on
+	webPort := os.Getenv("WA_WEB_PORT") //port where the web ui listens on
 
 	//webreport address
 	webReportAddr := fmt.Sprintf("%s:%s", webHost, webPort)

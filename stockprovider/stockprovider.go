@@ -7,6 +7,7 @@ import (
 	"github.com/iTagir/stocks/mdb"
 	"log"
 	"net/http"
+	"os"
 )
 
 func handleStocks(dbhost string, dbname string, dbcoll string) common.HTTPResponseFunc {
@@ -28,11 +29,11 @@ func handleStocks(dbhost string, dbname string, dbcoll string) common.HTTPRespon
 
 func main() {
 
-	host := "localhost"       //os.Getenv("STOCK_HOST")
-	port := "33001"           //os.Getenv("STOCK_PORT")
-	mongoHost := "tagir-tosh" //os.Getenv("MONGO_HOST")
-	mongoDB := "test"         //os.Getenv("MONGO_DB")
-	mongoColl := "testcoll"   //os.Getenv("MONGO_COLLECTION")
+	host := os.Getenv("STOCK_HOST")
+	port := os.Getenv("STOCK_PORT")
+	mongoHost := os.Getenv("MONGO_HOST")
+	mongoDB := os.Getenv("MONGO_DB")
+	mongoColl := os.Getenv("MONGO_COLLECTION")
 
 	if port == "" {
 		log.Fatal("Port variable STOCK_PORT was not set.")
