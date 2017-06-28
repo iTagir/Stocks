@@ -44,8 +44,11 @@ func (mconn *MongoDBConn) Stock(symbol string, data *[]StockData) {
 	}
 	defer session.Close()
 	c := session.DB(mconn.db).C(mconn.coll)
-
-	q := c.Find(bson.M{"symbol": symbol})
+	var sf = bson.M{}
+	if symbol != "" {
+		sf = bson.M{"symbol": symbol}
+	}
+	q := c.Find(sf)
 	if q == nil {
 		log.Fatal(err)
 	}
@@ -57,6 +60,8 @@ func (mconn *MongoDBConn) Stock(symbol string, data *[]StockData) {
 }
 
 //StockDataTables returns a slice of stocks for the given symbol from MongoDB
+//The JSON formatted so it can be used by DataTables straight away.
+//It adds Delete button for the html table as well.
 func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {
@@ -81,14 +86,12 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 	data.Data = make([][]string, 0, dlen-1)
 	for i := 0; i < dlen; i++ {
 		cd := []string{d[i].Symbol, fmt.Sprintf("%f", d[i].Price), fmt.Sprintf("%d", d[i].Quantity), fmt.Sprintf("%f", d[i].Tax), d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
-		//cd := coldata{d[i].Symbol, d[i].Price, d[i].Quantity, d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
 		data.Data = append(data.Data, cd)
-		//data.Data = append(data.Data, fmt.Sprintf("%s,%f,%d,%s,%s,<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Symbol, d[i].Price, d[i].Quantity, d[i].InsertDate, d[i].Operation, d[i].Id.Hex()))
 	}
 
 }
 
-//Stock returns a slice of stocks for the given symbol from MongoDB
+//StockUniqueSymbols returns a slice of unique stock ticker from MongoDB
 func (mconn *MongoDBConn) StockUniqueSymbols(data *[]string) {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {
@@ -138,7 +141,7 @@ func (mconn *MongoDBConn) StockByID(id string, data *[]StockData) error {
 	return nil
 }
 
-//RemoveById removes a document by ID from MongoDB
+//RemoveByID removes a document by ID from MongoDB
 func (mconn *MongoDBConn) RemoveByID(id string) error {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {

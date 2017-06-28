@@ -13,7 +13,7 @@ import (
 func handleStocks(w http.ResponseWriter, r *http.Request) {
 	stockSymbol := r.FormValue("symbol")
 	log.Println("Requested symbol:", stockSymbol)
-	resp, err := http.Get("http://localhost:33001/stocks?symbol=" + stockSymbol)
+	resp, err := http.Get("http://localhost:33001/stocksDataTable?symbol=" + stockSymbol)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return

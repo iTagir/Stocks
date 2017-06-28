@@ -1,4 +1,4 @@
-function loadStockList(symbol,tabId) {
+function loadStockList_not_in_use(symbol,tabId) {
   
         $('#statustext').html('sending..');
         
