@@ -33,6 +33,29 @@ func handleStocks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleDashStocks(w http.ResponseWriter, r *http.Request) {
+	stockSymbol := r.FormValue("symbol")
+	log.Println("Requested symbol:", stockSymbol)
+	resp, err := http.Get("http://localhost:33001/stocksProgressTable")
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+		//return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		log.Println("Request failed: ", resp.StatusCode)
+		return
+		//return nil, fmt.Errorf("Request failed: %d", resp.StatusCode)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	var bs []byte
+	bs, err = ioutil.ReadAll(resp.Body)
+	if err == nil {
+		w.Write(bs)
+	}
+}
+
 func handleStocksAdd(w http.ResponseWriter, r *http.Request) {
 	//reqBody := r.Body
 	var req *http.Request
@@ -120,6 +143,7 @@ func main() {
 	http.HandleFunc("/stocks/add", handleStocksAdd)
 	http.HandleFunc("/stocks/del", handleStocksDel)
 
+	http.HandleFunc("/dashallstocks", handleDashStocks)
 	log.Println("Start listening on ", webReportAddr)
 	log.Fatal(http.ListenAndServe(webReportAddr, nil))
 

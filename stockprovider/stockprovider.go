@@ -11,20 +11,56 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
+//StockProgressData the data type to return
+type StockProgressData struct {
+	Symbol string  `json:"symbol"`
+	Price  float32 `json:"price"`
+}
+
+type StockDataProgressTables struct {
+	Data [][]string `json:"data"`
+}
+
 //handleStocksProgress queries for stocks in MongoDB and then queries current process in Yahoo
-func handleStocksProgress(dbhost string, dbname string, dbcoll string) common.HTTPResponseFunc {
+func handleStocksProgressTable(dbhost string, dbname string, dbcoll string) common.HTTPResponseFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		d := make([]string, 0, 100)
+		//	d := make([]string, 0, 100)
 		mdbConn := mdb.CreateMongoDBConn(dbhost, dbname, dbcoll)
-		mdbConn.StockUniqueSymbols(&d)
-		sqr := yahoolib.StockQueryResult{}
-		for _, sym := range d {
-			err := yahoolib.YahooStockData(sym, &sqr)
+		//get current sums
+		stkSums := []mdb.StockDataSums{}
+		mdbConn.StockSums(&stkSums)
+		//get unique stock symbols
+		//mdbConn.StockUniqueSymbols(&d) //don't need that
+		//loop symbols
+		//sp := []StockProgressData{}
+		sp := StockDataProgressTables{}
+		splen := len(stkSums)
+		sp.Data = make([][]string, 0, splen-1)
+		for _, stk := range stkSums {
+			sqr := yahoolib.StockQueryResult{}
+			//get current prices from yahoo
+			err := yahoolib.YahooStockData(stk.Symbol, &sqr)
 			if err != nil {
-				log.Fatal("test failed")
+				log.Println("Error: ", err)
+				continue
 			}
+			ap, err := strconv.ParseFloat(sqr.Query.Result.Quote.Ask, 32)
+			if err != nil {
+				log.Fatal("Could not parse asking price.")
+			}
+			//sp = append(sp, StockProgressData{stk.Symbol, float32(ap)})
+			avgPrice := stk.PriceSum / float32(stk.Count)
+			invTotal := stk.InvestedSum / 100
+			cd := []string{stk.Symbol, fmt.Sprintf("%d", stk.QuantitySum), fmt.Sprintf("%d", stk.Count), fmt.Sprintf("%.2f", invTotal), fmt.Sprintf("%f", avgPrice), fmt.Sprintf("%f", ap)}
+			sp.Data = append(sp.Data, cd)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(sp)
+		if err != nil {
+			log.Println("StockProvider response encode error: ", err)
 		}
 	}
 }
@@ -63,8 +99,8 @@ func main() {
 
 	handle := handleStocks(mongoHost, mongoDB, mongoColl)
 	http.HandleFunc("/stocksDataTable", handle)
-	handle = handleStocksProgress(mongoHost, mongoDB, mongoColl)
-	http.HandleFunc("/stocksProgress", handle)
+	handle = handleStocksProgressTable(mongoHost, mongoDB, mongoColl)
+	http.HandleFunc("/stocksProgressTable", handle)
 
 	log.Println("Start listening on ", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))

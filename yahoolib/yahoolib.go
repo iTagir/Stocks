@@ -8,9 +8,9 @@ Queries stock data from yahoo
 import (
 	"fmt"
 	"github.com/iTagir/bf/api"
+
 	"log"
 	"net/http"
-	"time"
 )
 
 type stockItem struct {
@@ -28,8 +28,7 @@ type queryResult struct {
 }
 
 type StockQueryResult struct {
-	Query      queryResult `json:"query"`
-	InsertDate time.Time
+	Query queryResult `json:"query"`
 }
 
 //Stock returns slice of stock from Yahoo FS API
@@ -48,11 +47,14 @@ func YahooStockData(symbol string, data *StockQueryResult) error {
 		return fmt.Errorf("Request failed: %d", resp.StatusCode)
 	}
 
-	//respJSON := map[string]api.Wldata{}
 	err = api.ParseResponse(resp, data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return err
+	}
+	log.Println("YL: ", symbol, data.Query.Result.Quote.Ask)
+	if data.Query.Result.Quote.Ask == "" {
+		return fmt.Errorf("Not found.")
 	}
 	return nil
 }

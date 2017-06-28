@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+type StockDataSums struct {
+	InvestedSum float32 `json:"isum" bson:"isum"`
+	PriceSum    float32 `json:"psum" bson:"psum"`
+	QuantitySum int     `json:"qsum" bson:"qsum"`
+	Count       int     `json:"cnt" bson:"cnt"`
+	Symbol      string  `json:"id" bson:"_id,omitempty"`
+}
+
 //StockData to hold stock details
 type StockData struct {
 	Symbol     string        `json:"symbol"`
@@ -89,6 +97,26 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 		data.Data = append(data.Data, cd)
 	}
 
+}
+
+//StockSums groups ticks and returns sums for fields
+func (mconn *MongoDBConn) StockSums(data *[]StockDataSums) {
+	session, err := mgo.Dial(mconn.host)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	c := session.DB(mconn.db).C(mconn.coll)
+	var sf = []bson.M{{"$group": bson.M{"_id": "$symbol", "isum": bson.M{"$sum": bson.M{"$multiply": []interface{}{"$price", "$quantity"}}}, "cnt": bson.M{"$sum": 1}, "psum": bson.M{"$sum": "$price"}, "qsum": bson.M{"$sum": "$quantity"}}}}
+
+	p := c.Pipe(sf)
+	if p == nil {
+		log.Fatal(err)
+	}
+	err = p.All(data)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 //StockUniqueSymbols returns a slice of unique stock ticker from MongoDB

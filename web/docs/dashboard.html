@@ -20,28 +20,19 @@
         $(document).ready(function () {
             //<!--all data arrays -->
 
-            //enable date picker
-            EnableDatePicker()
-
+           
             stockTable = $('#stocks').DataTable({
                 "ajax": {
-                    "url": "/stocks"
+                    "url": "/dashallstocks"
                 }
             });
-            $('#stocks').on('draw.dt', function () {
-                registerDelButtons()
-            });
+           
 
             $("#btnRefresh").click(function () {
                 refreshTable(stockTable, )
             });
 
-            $("#btnBuy").click(function () {
-                buyCall()
-            });
-            $("#btnSell").click(function () {
-                sellCall()
-            });
+            
 
 
         }
@@ -51,38 +42,13 @@
 
 <body>
     <ul class="nav nav-tabs">
-        <li role="dash" ><a href="dashboard.html">Dashboard</a></li>
-        <li role="journal" class="active"><a href="transactions.html">Journal</a></li>
+        <li role="dash" class="active"><a href="dashboard.html">Dashboard</a></li>
+        <li role="journal" ><a href="transactions.html">Journal</a></li>
         <li role="stocks"><a href="stocks.html">Stocks</a></li>
         <li role="dividends"><a href="#">Dividends</a></li>
     </ul>
 
-
-    <!-- top add stock imput form -->
-        <div class="panel">
-            <div class="panel-body">
-                <div class="form-group form-inline row">
-                    <label id="labTick">Tick</lable>
-            <input type="text" id="tick" size="5" class="form-control">
-            
-            <label id="labQuant">Quantity</lable>
-           
-            <input type="number" id="quant"  class="form-control">
-            
-            <label id="labPrice">Price</lable>
-            <input type="number" id="price" size="5" class="form-control">
-            </div> <div class="form-group form-inline row">
-            <label id="labComm">Commission</lable>
-            <input type="number" id="commission" size="5" class="form-control">
-            <label id="labTax">Tax</lable>
-            <input type="number" id="tax" size="5" class="form-control">
-            <label id="labDate">Date</lable>
-            <input type="text" id="datepicker" size="7" class="form-control">
-            <button id="btnBuy">Buy</button>
-            <button id="btnSell">Sell</button>
-        </div>
-        </div>
-        </div>
+    
         
         
         <!--stocks table -->
@@ -93,12 +59,13 @@
                         <thead>
                             <tr>
                                 <th>Tick</th>
-                                <th>Price</th>
+                                
                                 <th>Quantity</th>
-                                <th>Tax</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                                <th></th>
+                                <th>Batches</th>
+                                <th>Total Invested</th>
+                                <th>Average Price</th>
+                                <th>Current Price</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="tab1">
@@ -107,11 +74,7 @@
                 </div>
             </div>
         
-            <!--<footer class="footer navbar-fixed-bottom">
-                <div class="container">
-                    <p class="text-muted">Place sticky footer content here.</p>
-                </div>
-            </footer>-->
+           
             <div class="panel-footer panel-primary navbar-fixed-bottom">
                 <div id="statustext"></div>
             </div>

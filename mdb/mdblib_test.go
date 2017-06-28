@@ -1,6 +1,7 @@
 package mdb
 
 import (
+	"fmt"
 	"log"
 	"testing"
 )
@@ -98,5 +99,30 @@ func TestMongoDBConn_StockUniqueSymbols(t *testing.T) {
 		})
 		a := *tt.args.data
 		log.Println("data=", a, tt.args.data)
+	}
+}
+
+func TestMongoDBConn_StockSums(t *testing.T) {
+	type args struct {
+		data *[]StockDataSums
+	}
+	d := []StockDataSums{}
+	tests := []struct {
+		name  string
+		mconn *MongoDBConn
+		args  args
+	}{
+		// TODO: Add test cases.
+		{"GSK.L",
+			&MongoDBConn{"tagir-tosh", "test", "testcoll"},
+			args{&d}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mconn.StockSums(tt.args.data)
+		})
+		for _, item := range *tt.args.data {
+			fmt.Println(item.Symbol, item.InvestedSum)
+		}
 	}
 }
