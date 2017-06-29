@@ -107,7 +107,24 @@ func (mconn *MongoDBConn) StockSums(data *[]StockDataSums) {
 	}
 	defer session.Close()
 	c := session.DB(mconn.db).C(mconn.coll)
-	var sf = []bson.M{{"$group": bson.M{"_id": "$symbol", "isum": bson.M{"$sum": bson.M{"$multiply": []interface{}{"$price", "$quantity"}}}, "cnt": bson.M{"$sum": 1}, "psum": bson.M{"$sum": "$price"}, "qsum": bson.M{"$sum": "$quantity"}}}}
+	// var sf = []bson.M{{"$group": bson.M{"_id": "$symbol",
+	// 	"isum": bson.M{"$sum": bson.M{"$multiply": []interface{}{"$price", "$quantity"}}},
+	// 	"cnt":  bson.M{"$sum": 1},
+	// 	"psum": bson.M{"$sum": "$price"},
+	// 	"qsum": bson.M{"$sum": "$quantity"}}}}
+	var sf = []bson.M{{"$group": bson.M{"_id": "$symbol",
+		"isum": bson.M{"$sum": bson.M{"$cond": bson.M{"if": bson.M{"$eq": []interface{}{"$operation", "Buy"}},
+			"then": bson.M{"$sum": bson.M{"$multiply": []interface{}{"$price", "$quantity"}}},
+			"else": bson.M{"$sum": bson.M{"$multiply": []interface{}{bson.M{"$multiply": []interface{}{"$price", "$quantity"}}, -1}}}}}},
+		"cnt": bson.M{"$sum": bson.M{"$cond": bson.M{"if": bson.M{"$eq": []interface{}{"$operation", "Buy"}},
+			"then": 1,
+			"else": 0}}},
+		"psum": bson.M{"$sum": bson.M{"$cond": bson.M{"if": bson.M{"$eq": []interface{}{"$operation", "Buy"}},
+			"then": "$price",
+			"else": 0}}},
+		"qsum": bson.M{"$sum": bson.M{"$cond": bson.M{"if": bson.M{"$eq": []interface{}{"$operation", "Buy"}},
+			"then": "$quantity",
+			"else": bson.M{"$multiply": []interface{}{-1, "$quantity"}}}}}}}}
 
 	p := c.Pipe(sf)
 	if p == nil {

@@ -122,7 +122,7 @@ func TestMongoDBConn_StockSums(t *testing.T) {
 			tt.mconn.StockSums(tt.args.data)
 		})
 		for _, item := range *tt.args.data {
-			fmt.Println(item.Symbol, item.InvestedSum)
+			fmt.Println(item.Symbol, item.InvestedSum, item.PriceSum, item.QuantitySum, item.Count)
 		}
 	}
 }
