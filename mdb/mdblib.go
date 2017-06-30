@@ -100,10 +100,10 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 }
 
 //StockSums groups ticks and returns sums for fields
-func (mconn *MongoDBConn) StockSums(data *[]StockDataSums) {
+func (mconn *MongoDBConn) StockSums(data *[]StockDataSums) error {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to connect to DB")
 	}
 	defer session.Close()
 	c := session.DB(mconn.db).C(mconn.coll)
@@ -128,38 +128,40 @@ func (mconn *MongoDBConn) StockSums(data *[]StockDataSums) {
 
 	p := c.Pipe(sf)
 	if p == nil {
-		log.Fatal(err)
+		return fmt.Errorf("Failed to query data.")
 	}
 	err = p.All(data)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("Failed to parse data.")
 	}
+	return nil
 }
 
 //StockUniqueSymbols returns a slice of unique stock ticker from MongoDB
-func (mconn *MongoDBConn) StockUniqueSymbols(data *[]string) {
+func (mconn *MongoDBConn) StockUniqueSymbols(data *[]string) error {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("Failed to connect to DB.")
 	}
 	defer session.Close()
 	c := session.DB(mconn.db).C(mconn.coll)
 
 	q := c.Find(nil)
 	if q == nil {
-		log.Fatal(err)
+		return fmt.Errorf("Failed to obtain result.")
 	}
 	var n int
 	n, err = q.Count()
 	if err != nil {
-		log.Fatal("Failed to count result", err)
+		return fmt.Errorf("Failed to count.")
 	}
 
 	log.Println("Count = ", n)
 	err = q.Distinct("symbol", data)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("Failed to identify distinct values.")
 	}
+	return nil
 }
 
 //StockByID returns a slice of stocks for the given Object ID from MongoDB

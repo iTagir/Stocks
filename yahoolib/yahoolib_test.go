@@ -1,7 +1,9 @@
 package yahoolib
 
-import "testing"
-import "log"
+import (
+	"log"
+	"testing"
+)
 
 func TestYahooStockData(t *testing.T) {
 	type args struct {
@@ -43,6 +45,35 @@ func TestYahooStockData(t *testing.T) {
 				log.Println("Ask: ", tt.args.data.Query.Result.Quote.Ask)
 			}
 
+		})
+	}
+}
+
+func TestStringArr2HTML(t *testing.T) {
+	type args struct {
+		sarr []string
+	}
+	data := []string{"GSK.L", "VOD.L"}
+	var out string = "%22GSK.L%22%2C%22VOD.L%22"
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "t1",
+			args: args{
+				sarr: data,
+			},
+			want: out,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := StringArr2HTML(tt.args.sarr); got != tt.want {
+				t.Errorf("StringArr2HTML() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

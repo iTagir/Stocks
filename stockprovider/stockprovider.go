@@ -27,27 +27,78 @@ type StockDataProgressTables struct {
 //handleStocksProgress queries for stocks in MongoDB and then queries current process in Yahoo
 func handleStocksProgressTable(dbhost string, dbname string, dbcoll string) common.HTTPResponseFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//	d := make([]string, 0, 100)
+		//
+		log.Println("p1")
+		sp := StockDataProgressTables{}
 		mdbConn := mdb.CreateMongoDBConn(dbhost, dbname, dbcoll)
+		log.Println("p2")
 		//get current sums
 		stkSums := []mdb.StockDataSums{}
-		mdbConn.StockSums(&stkSums)
-		//get unique stock symbols
-		//mdbConn.StockUniqueSymbols(&d) //don't need that
-		//loop symbols
-		//sp := []StockProgressData{}
-		sp := StockDataProgressTables{}
+		err1 := mdbConn.StockSums(&stkSums)
+		log.Println("p3")
+		if err1 != nil {
+			w.Header().Set("Content-Type", "application/json")
+			err1 := json.NewEncoder(w).Encode(sp)
+			if err1 != nil {
+				log.Println("StockProvider response encode error: ", err1)
+
+			}
+			return
+		}
+		log.Println("p3.1")
 		splen := len(stkSums)
-		sp.Data = make([][]string, 0, splen-1)
+		log.Println("p3.2", splen)
+		if splen == 0 {
+			sp.Data = make([][]string, 0, 0)
+		} else {
+			sp.Data = make([][]string, 0, splen-1)
+		}
+
+		log.Println("p3.3")
+		//get unique stock symbols
+		d := make([]string, 0, 1)
+		err1 = mdbConn.StockUniqueSymbols(&d)
+		if err1 != nil {
+			w.Header().Set("Content-Type", "application/json")
+			err1 = json.NewEncoder(w).Encode(sp)
+			if err1 != nil {
+				log.Println("StockUniqueSymbols response encode error: ", err1)
+
+			}
+			return
+		}
+		log.Println("p4")
+		symStr := yahoolib.StringArr2HTML(d)
+		//get yahoo for symbols
+		sqr := yahoolib.StockQueryResult{}
+		//get current prices from yahoo
+		err := yahoolib.YahooStockData(symStr, &sqr)
+		if err != nil {
+			log.Println("Error: ", err)
+			//continue
+			w.Header().Set("Content-Type", "application/json")
+			err2 := json.NewEncoder(w).Encode(sp)
+			if err2 != nil {
+				log.Println("StockProvider response encode error: ", err2)
+			}
+			return
+		}
+
 		for _, stk := range stkSums {
-			sqr := yahoolib.StockQueryResult{}
-			//get current prices from yahoo
-			err := yahoolib.YahooStockData(stk.Symbol, &sqr)
-			if err != nil {
-				log.Println("Error: ", err)
+			//looking for symbol in yahoo array
+			var ask string
+			for _, v := range sqr.Query.Results.Quote {
+				if v.Symbol == stk.Symbol {
+					ask = v.Ask
+					break
+				}
+			}
+			if ask == "" {
+				log.Println("Symbol not found", stk.Symbol)
 				continue
 			}
-			ap, err := strconv.ParseFloat(sqr.Query.Result.Quote.Ask, 32)
+			//convert string price to float
+			ap, err := strconv.ParseFloat(ask, 32)
 			if err != nil {
 				log.Fatal("Could not parse asking price.")
 			}
@@ -58,9 +109,9 @@ func handleStocksProgressTable(dbhost string, dbname string, dbcoll string) comm
 			sp.Data = append(sp.Data, cd)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(sp)
-		if err != nil {
-			log.Println("StockProvider response encode error: ", err)
+		err3 := json.NewEncoder(w).Encode(sp)
+		if err3 != nil {
+			log.Println("StockProvider response encode error: ", err3)
 		}
 	}
 }
