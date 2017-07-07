@@ -123,10 +123,12 @@ func handleStocks(dbhost string, dbname string, dbcoll string) common.HTTPRespon
 		//d := make([]mdb.StockData, 0, 10)
 		d := mdb.StockDataTables{}
 		mdbConn := mdb.CreateMongoDBConn(dbhost, dbname, dbcoll)
-		mdbConn.StockDataTables(stockSymbol, &d)
+		err := mdbConn.StockDataTables(stockSymbol, &d)
+		if err != nil {
+			log.Println("Failed to get data from DB: ", err)
+		}
 		w.Header().Set("Content-Type", "application/json")
-
-		err := json.NewEncoder(w).Encode(d)
+		err = json.NewEncoder(w).Encode(d)
 		if err != nil {
 			log.Println("StockProvider response encode error: ", err)
 		}

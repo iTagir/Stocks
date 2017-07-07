@@ -70,10 +70,11 @@ func (mconn *MongoDBConn) Stock(symbol string, data *[]StockData) {
 //StockDataTables returns a slice of stocks for the given symbol from MongoDB
 //The JSON formatted so it can be used by DataTables straight away.
 //It adds Delete button for the html table as well.
-func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) {
+func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) error {
 	session, err := mgo.Dial(mconn.host)
 	if err != nil {
-		panic(err)
+		log.Println("Can't connect to Mongo DB:", mconn.host)
+		return err
 	}
 	defer session.Close()
 	c := session.DB(mconn.db).C(mconn.coll)

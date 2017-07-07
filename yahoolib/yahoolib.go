@@ -8,7 +8,6 @@ Queries stock data from yahoo
 import (
 	"fmt"
 	"github.com/iTagir/stocks/common"
-
 	"log"
 	"net/http"
 )
