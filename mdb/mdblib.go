@@ -97,7 +97,7 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 		cd := []string{d[i].Symbol, fmt.Sprintf("%f", d[i].Price), fmt.Sprintf("%d", d[i].Quantity), fmt.Sprintf("%f", d[i].Tax), d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
 		data.Data = append(data.Data, cd)
 	}
-
+	return nil
 }
 
 //StockSums groups ticks and returns sums for fields
