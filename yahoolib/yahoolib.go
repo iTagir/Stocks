@@ -7,7 +7,7 @@ Queries stock data from yahoo
 
 import (
 	"fmt"
-	"github.com/iTagir/bf/api"
+	"github.com/iTagir/stocks/common"
 
 	"log"
 	"net/http"
@@ -47,7 +47,7 @@ func YahooStockData(symbol string, data *StockQueryResult) error {
 		return fmt.Errorf("Request failed: %d", resp.StatusCode)
 	}
 
-	err = api.ParseResponse(resp, data)
+	err = common.ParseResponse(resp, data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return err

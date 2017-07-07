@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/iTagir/bf/api"
 	"github.com/iTagir/stocks/common"
 	"github.com/iTagir/stocks/mdb"
 	"log"
@@ -20,7 +19,7 @@ func addStock(dbhost string, dbname string, dbcoll string) common.HTTPResponseFu
 		w.Header().Set("Content-Type", "application/json")
 
 		b := mdb.StockData{}
-		err := api.ParseJSONBody(r.Body, &b)
+		err := common.ParseJSONBody(r.Body, &b)
 		if err != nil {
 			log.Println("Request parse error ", err)
 			d.Status = "FAILED"
@@ -53,7 +52,7 @@ func delStock(dbhost string, dbname string, dbcoll string) common.HTTPResponseFu
 			Id string `json:"id"`
 		}
 		b := delReq{}
-		err := api.ParseJSONBody(r.Body, &b)
+		err := common.ParseJSONBody(r.Body, &b)
 		if err != nil {
 			log.Println("Request parse error ", err)
 			d.Status = "FAILED"
