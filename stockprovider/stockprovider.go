@@ -137,14 +137,14 @@ func handleStocks(dbhost string, dbname string, dbcoll string) common.HTTPRespon
 
 func main() {
 
-	host := os.Getenv("STOCK_HOST")
-	port := os.Getenv("STOCK_PORT")
+	host := os.Getenv("SP_HOST")
+	port := os.Getenv("SP_PORT")
 	mongoHost := os.Getenv("MONGO_HOST")
 	mongoDB := os.Getenv("MONGO_DB")
 	mongoColl := os.Getenv("MONGO_COLLECTION")
 
 	if port == "" {
-		log.Fatal("Port variable STOCK_PORT was not set.")
+		log.Fatal("Port variable SP_PORT was not set.")
 		return
 	}
 

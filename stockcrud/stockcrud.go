@@ -75,14 +75,14 @@ func delStock(dbhost string, dbname string, dbcoll string) common.HTTPResponseFu
 
 func main() {
 
-	host := os.Getenv("STOCKCRUD_HOST")
-	port := os.Getenv("STOCKCRUD_PORT")
+	host := os.Getenv("CRUD_HOST")
+	port := os.Getenv("CRUD_PORT")
 	mongoHost := os.Getenv("MONGO_HOST")
 	mongoDB := os.Getenv("MONGO_DB")
 	mongoColl := os.Getenv("MONGO_COLLECTION")
 
 	if port == "" {
-		log.Fatal("Port variable STOCKCRUD_PORT was not set.")
+		log.Fatal("Port variable CRUD_PORT was not set.")
 		return
 	}
 
