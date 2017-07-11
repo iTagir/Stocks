@@ -32,7 +32,11 @@ type StockQueryResult struct {
 
 //Stock returns slice of stock from Yahoo FS API
 func YahooStockData(symbol string, data *StockQueryResult) error {
-
+        log.Println("Yahoo search string: ", symbol)
+        if symbol == "" {
+          log.Println("Empty search string, exit.")
+          return nil
+	}
 	qurl := "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20%28" + symbol + "%29&env=store://datatables.org/alltableswithkeys&format=json"
 	fmt.Println(qurl)
 	resp, err := http.Get(qurl)

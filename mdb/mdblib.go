@@ -92,7 +92,11 @@ func (mconn *MongoDBConn) StockDataTables(symbol string, data *StockDataTables) 
 		log.Fatal(err)
 	}
 	dlen := len(d)
-	data.Data = make([][]string, 0, dlen-1)
+        if dlen == 0 {
+	  data.Data = make([][]string, 0, 0)
+        } else {
+	  data.Data = make([][]string, 0, dlen-1)
+        }
 	for i := 0; i < dlen; i++ {
 		cd := []string{d[i].Symbol, fmt.Sprintf("%f", d[i].Price), fmt.Sprintf("%d", d[i].Quantity), fmt.Sprintf("%f", d[i].Tax), d[i].InsertDate, d[i].Operation, fmt.Sprintf("<button id='%s' class='delstock btn-danger btn-xs'>Delete</button>", d[i].Id.Hex())}
 		data.Data = append(data.Data, cd)
