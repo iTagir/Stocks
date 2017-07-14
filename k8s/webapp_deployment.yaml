@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1 
+kind: Deployment
+metadata:
+  name: stockswebapp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: stockswa
+        image: itagir/stocks_wa
+        ports:
+        - containerPort: 33000

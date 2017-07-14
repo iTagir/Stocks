@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1 
+kind: Deployment
+metadata:
+  name: stockprovider
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stockprovider
+    spec:
+      containers:
+      - name: stockprovider
+        image: itagir/stocks_provider
+        ports:
+        - containerPort: 33001
